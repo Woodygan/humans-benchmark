@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "HUMANS-Benchmark"
+version = "0.1.0"
+description = "HUMANS-Benchmark"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["audio", "benchmark", "evaluation", "large-audio-models", "speech", "human-preference"]
+authors = [
+    {name = "Anonymous", email = "anonymous@example.com"}
+]
+maintainers = [
+    {name = "Anonymous", email = "anonymous@example.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+dependencies = [
+    "numpy>=1.21.0",
+    "datasets>=2.14.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=6.0.0",
+]
+audio = [
+    "librosa>=0.10.0",
+    "soundfile>=0.12.0",
+]
+metrics = [
+    "jiwer>=3.0.0",
+]
+all = [
+    "librosa>=0.10.0",
+    "soundfile>=0.12.0",
+    "jiwer>=3.0.0",
+    "openai>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/EfficientAudioBench/HUMANS_Benchmark"
+Documentation = "https://github.com/EfficientAudioBench/HUMANS_Benchmark"
+Repository = "https://github.com/EfficientAudioBench/HUMANS_Benchmark"
+"Bug Tracker" = "https://github.com/EfficientAudioBench/HUMANS_Benchmark/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 120
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
