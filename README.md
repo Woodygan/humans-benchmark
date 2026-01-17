@@ -2,7 +2,7 @@
 
 **Authors:** Woody Haosheng Gan¹, William Held²'³, Diyi Yang²
 
-¹University of Southern California, ²Stanford University, ³Georgia Institute of Technology
+¹University of Southern California, ²Stanford University, ³OpenAthena
 
 **HUMANS: HUman-aligned Minimal Audio evaluatioN Subsets for Large Audio Models**
 
