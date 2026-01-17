@@ -5,16 +5,18 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "HUMANS-Benchmark"
 version = "0.1.0"
-description = "HUMANS-Benchmark"
+description = "Putting HUMANS first: Efficient LAM Evaluation with Human Preference Alignment"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 keywords = ["audio", "benchmark", "evaluation", "large-audio-models", "speech", "human-preference"]
 authors = [
-    {name = "Anonymous", email = "anonymous@example.com"}
+    {name = "Woody Haosheng Gan", email = "woodygan@usc.edu"},
+    {name = "William Held"},
+    {name = "Diyi Yang"}
 ]
 maintainers = [
-    {name = "Anonymous", email = "anonymous@example.com"}
+    {name = "Woodygan", email = "woodygan@usc.edu"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -31,9 +33,39 @@ classifiers = [
 ]
 
 dependencies = [
+    # Core dependencies
     "numpy>=1.21.0",
     "datasets>=2.14.0",
     "tqdm>=4.65.0",
+    "soundfile>=0.12.0",
+
+    # API clients
+    "openai>=1.0.0",
+    "google-genai>=0.2.0",
+
+    # Audio and speech processing
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "torchcodec>=0.1.0",
+    "librosa>=0.10.0",
+    "pydub>=0.25.0",
+    "speech_metrics>=0.2.0",
+
+    # NLP and transformers
+    "transformers>=4.30.0",
+    "nltk>=3.8.0",
+
+    # Evaluation metrics
+    "qa_metrics>=0.2.0",
+    "intervaltree>=3.1.0",
+    "instruction_following_eval @ git+https://github.com/josejg/instruction_following_eval.git",
+
+    # Math and utilities
+    "scipy>=1.7.0",
+    "regex>=2022.1.18",
+
+    # Optional but recommended
+    "python-dotenv>=0.19.0",
 ]
 
 [project.optional-dependencies]
@@ -43,25 +75,13 @@ dev = [
     "black>=22.0.0",
     "flake8>=6.0.0",
 ]
-audio = [
-    "librosa>=0.10.0",
-    "soundfile>=0.12.0",
-]
-metrics = [
-    "jiwer>=3.0.0",
-]
-all = [
-    "librosa>=0.10.0",
-    "soundfile>=0.12.0",
-    "jiwer>=3.0.0",
-    "openai>=1.0.0",
-]
 
 [project.urls]
-Homepage = "https://github.com/EfficientAudioBench/HUMANS_Benchmark"
-Documentation = "https://github.com/EfficientAudioBench/HUMANS_Benchmark"
-Repository = "https://github.com/EfficientAudioBench/HUMANS_Benchmark"
-"Bug Tracker" = "https://github.com/EfficientAudioBench/HUMANS_Benchmark/issues"
+Homepage = "https://github.com/Woodygan/humans-benchmark"
+Documentation = "https://github.com/Woodygan/humans-benchmark"
+Repository = "https://github.com/Woodygan/humans-benchmark"
+"Bug Tracker" = "https://github.com/Woodygan/humans-benchmark/issues"
+Dataset = "https://huggingface.co/datasets/rma9248/humans-benchmark"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -71,7 +91,7 @@ where = ["src"]
 
 [tool.black]
 line-length = 120
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
 include = '\.pyi?$'
 
 [tool.pytest.ini_options]
