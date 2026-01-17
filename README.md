@@ -1,4 +1,4 @@
-# HUMANS Benchmark Dataset
+# HUMANS Benchmark
 
 **Authors:** Woody Haosheng Gan¹, William Held²'³, Diyi Yang²
 
@@ -6,7 +6,7 @@
 
 **HUMANS: HUman-aligned Minimal Audio evaluatioN Subsets for Large Audio Models**
 
-This dataset is part of the **Putting HUMANS first: Efficient LAM Evaluation with Human Preference Alignment** paper.
+This repo is part of the **Putting HUMANS first: Efficient LAM Evaluation with Human Preference Alignment** paper.
 
 HUMANS Benchmark is designed to efficiently evaluate Large Audio Models using minimal subsets while predicting human preferences through learned regression weights.
 
