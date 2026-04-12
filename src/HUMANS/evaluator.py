@@ -202,7 +202,7 @@ class HUMANSEvaluator:
         print(f"HUMANS Benchmark Results ({self.subset})")
         print(f"{'='*50}")
         if 'human_overall_score' in score_summary:
-            print(f"  Human Overall Score (primary):       {score_summary['human_overall_score']:.4f}")
+            print(f"  Human Preference Score (overall):       {score_summary['human_overall_score']:.4f}")
         for dim in HUMAN_DIMENSIONS[1:]:  # skip overall, already printed
             key = f'human_{dim}_score'
             if key in score_summary:

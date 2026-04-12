@@ -31,7 +31,7 @@ def predict_fn(messages, audio_output, text_output, tools=None, tool_choice="aut
 results = evaluator.evaluate(predict_fn=predict_fn, mode="both")
 
 # human_overall_score is the primary score to report for model comparison
-print(f"Human Overall Score (primary):  {results['human_overall_score']:.4f}")
+print(f"Human Preference Score (overall):  {results['human_overall_score']:.4f}")
 print(f"Human Understanding Score:      {results['human_understanding_score']:.4f}")
 print(f"Human Naturalness Score:        {results['human_naturalness_score']:.4f}")
 print(f"Human Response Quality Score:   {results['human_response_quality_score']:.4f}")
