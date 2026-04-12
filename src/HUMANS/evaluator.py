@@ -47,6 +47,7 @@ except ImportError:
 #     tool_calls: Optional[List[Dict[str, Any]]] = None
 #     metadata: Optional[Dict[str, Any]] = field(default_factory=dict)
 
+HUMAN_DIMENSIONS = ["overall", "understanding", "naturalness", "response_quality", "task_effectiveness"]
 
 class HUMANSEvaluator:
     """
@@ -85,11 +86,19 @@ class HUMANSEvaluator:
         
         print(f"✓ Loaded {len(self.items)} evaluation items")
         
-        # Extract weights and bias
-        self.human_weights = np.array([item['human_preference_weight'] for item in self.items])
+        # Overall benchmark weights (for benchmark approximation)
         self.benchmark_weights = np.array([item['full_benchmark_weight'] for item in self.items])
-        self.regression_bias = self.items[0]['human_regression_bias']
-        
+
+        # Per-dimension human preference weights and biases
+        self.dim_weights = {}
+        self.dim_biases = {}
+        for dim in HUMAN_DIMENSIONS:
+            w_key = f'{dim}_human_preference_weight'
+            b_key = f'{dim}_human_regression_bias'
+            if w_key in self.items[0]:
+                self.dim_weights[dim] = np.array([item[w_key] for item in self.items])
+                self.dim_biases[dim]  = float(self.items[0][b_key])
+
         # Create persistent directory for audio files
         self.audio_dir = Path(audio_dir)
         self.audio_dir.mkdir(parents=True, exist_ok=True)
@@ -140,7 +149,7 @@ class HUMANSEvaluator:
         Args:
             predict_fn: Function (messages, audio_output, text_output) -> ModelResponse
                        Takes conversation messages and output flags, returns model response
-            mode: "human" for human preference prediction (0-1 scale)
+            mode: "human" for human preference prediction (0-1 scale) on each dimension
                   "benchmark" for full benchmark score approximation
                   "both" for both scores (default)
             save_results: Whether to save results to JSON file (default: True)
@@ -148,11 +157,7 @@ class HUMANSEvaluator:
             verbose: Show progress bar during evaluation
             
         Returns:
-            Dictionary with evaluation results:
-            - human_score (if mode="human" or "both"): Human preference score [0, 1]
-            - benchmark_score (if mode="benchmark" or "both"): Full benchmark score
-            - num_items: Number of items evaluated
-            - details: Per-item results
+            Dictionary with evaluation results
         """
         if mode not in ["human", "benchmark", "both"]:
             raise ValueError(f"mode must be 'human', 'benchmark', or 'both', got '{mode}'")
@@ -172,34 +177,54 @@ class HUMANSEvaluator:
                     print(f"\n⚠ Error on item {item['item_id']}: {e}")
                 scores.append(0.0)
                 details.append({
-                    'item_id': item['item_id'],
-                    'task': item.get('task', ''),
-                    'error': str(e),
-                    'score': 0.0,
+                    'item_id':  item['item_id'],
+                    'task':     item.get('task', ''),
+                    'error':    str(e),
+                    'score':    0.0,
                 })
         
-        scores = np.array(scores)
-        
-        # Compute scores based on mode
-        results = {
-            "num_items": len(scores),
-            "subset": self.subset,
-            "audio_dir": str(self.audio_dir.absolute()),
-            "details": details,
-        }
-        
+        scores_arr = np.array(scores)
+
+        # ── Compute scores ────────────────────────────────────────────────────
+        score_summary = {}
+
         if mode in ["human", "both"]:
-            # Human preference score with regression, clipped to [0, 1]
-            human_score_raw = np.dot(self.human_weights, scores) + self.regression_bias
-            human_score = float(np.clip(human_score_raw, 0.0, 1.0))
-            results["human_score"] = human_score
-        
+            for dim in HUMAN_DIMENSIONS:
+                if dim in self.dim_weights:
+                    raw = np.dot(self.dim_weights[dim], scores_arr) + self.dim_biases[dim]
+                    score_summary[f'human_{dim}_score'] = float(np.clip(raw, 0.0, 1.0))
+
         if mode in ["benchmark", "both"]:
-            # Benchmark score (weighted average)
-            benchmark_score = float(np.dot(self.benchmark_weights, scores))
-            results["benchmark_score"] = benchmark_score
-        
-        # Save results to JSON if requested
+            score_summary['benchmark_score'] = float(np.dot(self.benchmark_weights, scores_arr))
+
+        # ── Print score summary ───────────────────────────────────────────────
+        print(f"\n{'='*50}")
+        print(f"HUMANS Benchmark Results ({self.subset})")
+        print(f"{'='*50}")
+        if 'human_overall_score' in score_summary:
+            print(f"  Human Overall Score (primary):       {score_summary['human_overall_score']:.4f}")
+        for dim in HUMAN_DIMENSIONS[1:]:  # skip overall, already printed
+            key = f'human_{dim}_score'
+            if key in score_summary:
+                print(f"  Human Score ({dim:<20}): {score_summary[key]:.4f}")
+        if 'benchmark_score' in score_summary:
+            print(f"  Benchmark Score:             {score_summary['benchmark_score']:.4f}")
+        print(f"  Items evaluated:             {len(scores)}")
+        print(f"{'='*50}\n")
+
+        # ── Build result dict (scores first, then metadata, then details) ─────
+        results = {
+            # scores up top for readability
+            **score_summary,
+            # metadata
+            "num_items": len(scores),
+            "subset":    self.subset,
+            "audio_dir": str(self.audio_dir.absolute()),
+            # per-item details at the bottom
+            "details":   details,
+        }
+
+        # ── Save results ──────────────────────────────────────────────────────
         if save_results:
             if results_path is None:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -211,7 +236,7 @@ class HUMANSEvaluator:
                 json.dump(results, f, indent=2)
             
             if verbose:
-                print(f"\n✓ Results saved to: {results_path.absolute()}")
+                print(f"✓ Results saved to: {results_path.absolute()}")
             
             results["results_path"] = str(results_path.absolute())
         

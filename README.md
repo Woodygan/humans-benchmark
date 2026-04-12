@@ -30,8 +30,13 @@ def predict_fn(messages, audio_output, text_output, tools=None, tool_choice="aut
 # Run evaluation
 results = evaluator.evaluate(predict_fn=predict_fn, mode="both")
 
-print(f"Human Preference Score: {results['human_score']:.4f}")
-print(f"Benchmark Score: {results['benchmark_score']:.4f}")
+# human_overall_score is the primary score to report for model comparison
+print(f"Human Overall Score (primary):  {results['human_overall_score']:.4f}")
+print(f"Human Understanding Score:      {results['human_understanding_score']:.4f}")
+print(f"Human Naturalness Score:        {results['human_naturalness_score']:.4f}")
+print(f"Human Response Quality Score:   {results['human_response_quality_score']:.4f}")
+print(f"Human Task Effectiveness Score: {results['human_task_effectiveness_score']:.4f}")
+print(f"Benchmark Score:                {results['benchmark_score']:.4f}")
 ```
 
 ---
@@ -179,7 +184,7 @@ results = evaluator.evaluate(
   - Function signature: `predict_fn(messages, audio_output, text_output, tools=None, tool_choice="auto") -> ModelResponse`
 
 - `mode` (str): Evaluation mode
-  - `"human"`: Compute human preference score only (0-1 scale)
+  - `"human"`: Compute human preference scores only (0-1 scale, one per dimension)
   - `"benchmark"`: Compute full benchmark score approximation
   - `"both"`: Compute both scores (default)
 
@@ -197,13 +202,25 @@ results = evaluator.evaluate(
 A dictionary containing:
 ```python
 {
-    "human_score": 0.75,              # Human preference score [0, 1] (if mode="human" or "both")
-    "benchmark_score": 0.68,           # Full benchmark score (if mode="benchmark" or "both")
-    "num_items": 50,                   # Number of evaluation items
-    "subset": "n50",                   # Subset used
-    "audio_dir": "/path/to/audio",     # Directory containing audio files
-    "results_path": "/path/to/results.json",  # Path to saved results (if save_results=True)
-    "details": [                       # Per-item evaluation details
+    # Human preference scores — one per dimension (if mode="human" or "both")
+    # human_overall_score is the primary score to report for model comparison
+    "human_overall_score": 0.75,            # ← primary score
+    "human_understanding_score": 0.70,
+    "human_naturalness_score": 0.78,
+    "human_response_quality_score": 0.72,
+    "human_task_effectiveness_score": 0.69,
+
+    # Benchmark score (if mode="benchmark" or "both")
+    "benchmark_score": 0.68,
+
+    # Metadata
+    "num_items": 50,
+    "subset": "n50",
+    "audio_dir": "/path/to/audio",
+    "results_path": "/path/to/results.json",  # if save_results=True
+
+    # Per-item evaluation details
+    "details": [
         {
             "item_id": "item_001",
             "task": "speech_recognition",
@@ -375,7 +392,6 @@ tool_calls = [
 ]
 ```
 
-
 **Important Notes:**
 
 - **For OpenAI models:** The `"id"` field is used to match tool responses back to the original function call
@@ -391,9 +407,11 @@ tool_calls = [
 The benchmark evaluates models across multiple datasets and tasks:
 
 **Dataset Items Include:**
-- `item_id`: Unique identifier
+- `item_id`: Unique identifier (original line index in full dataset)
+- `position`: Position in subset (unique per row, even for duplicate items)
 - `task`: Task name (e.g., "speech_recognition", "emotion", "function_calling")
 - `dataset`: Source dataset name
+- `prompt`: Text instruction/prompt for the model
 - `metric`: Evaluation metric used
 - `audio_input`: Input audio (if applicable)
 - `text_input`: Input text prompt (if applicable)
@@ -401,8 +419,12 @@ The benchmark evaluates models across multiple datasets and tasks:
 - `text_reference`: Reference/ground truth text in list format (e.g., `text_reference[0]` for single answer)
 - `audio_output`: Whether task expects audio output
 - `text_output`: Whether task expects text output
-- `human_preference_weight`: Weight for human preference regression
-- `full_benchmark_weight`: Weight for full benchmark score
+- `full_benchmark_weight`: Weight for full benchmark score approximation
+- `overall_human_preference_weight` / `overall_human_regression_bias`: Weights and bias for overall human preference (**primary dimension**)
+- `understanding_human_preference_weight` / `understanding_human_regression_bias`: Weights and bias for understanding dimension
+- `naturalness_human_preference_weight` / `naturalness_human_regression_bias`: Weights and bias for naturalness dimension
+- `response_quality_human_preference_weight` / `response_quality_human_regression_bias`: Weights and bias for response quality dimension
+- `task_effectiveness_human_preference_weight` / `task_effectiveness_human_regression_bias`: Weights and bias for task effectiveness dimension
 
 **Available Subsets:**
 - `n10`: 10 evaluation items (fast, less accurate)
