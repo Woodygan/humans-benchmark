@@ -455,6 +455,7 @@ MIT License
 
 ## 🔗 Links
 
+- **Paper:** [ACL Anthology](https://aclanthology.org/2026.acl-long.1816)
 - **Dataset:** [HuggingFace Dataset](https://huggingface.co/datasets/woodygan/humans-benchmark)
 - **Repository:** [GitHub](https://github.com/Woodygan/humans-benchmark)
 - **Issues:** [Bug Tracker](https://github.com/Woodygan/humans-benchmark/issues)
