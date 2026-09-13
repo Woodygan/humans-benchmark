@@ -18,7 +18,7 @@ from HUMANS import HUMANSEvaluator, Message, ModelResponse
 
 # Initialize evaluator
 evaluator = HUMANSEvaluator(
-    dataset_name="rma9248/humans-benchmark",
+    dataset_name="woodygan/humans-benchmark",
     subset="n50"
 )
 
@@ -137,7 +137,7 @@ The example demonstrates:
 #### Initialization
 ```python
 evaluator = HUMANSEvaluator(
-    dataset_name: str = "rma9248/humans-benchmark",
+    dataset_name: str = "woodygan/humans-benchmark",
     subset: str = "n50",
     cache_dir: Optional[str] = None,
     audio_dir: str = "humans-audio",
@@ -148,7 +148,7 @@ evaluator = HUMANSEvaluator(
 **Parameters:**
 
 - `dataset_name` (str): HuggingFace dataset identifier
-  - Default: `"rma9248/humans-benchmark"`
+  - Default: `"woodygan/humans-benchmark"`
 
 - `subset` (str): Evaluation subset to use
   - Options: `"n10"`, `"n20"`, `"n30"`, `"n50"`, `"n100"`, `"n200"`
@@ -455,7 +455,7 @@ MIT License
 
 ## 🔗 Links
 
-- **Dataset:** [HuggingFace Dataset](https://huggingface.co/datasets/rma9248/humans-benchmark)
+- **Dataset:** [HuggingFace Dataset](https://huggingface.co/datasets/woodygan/humans-benchmark)
 - **Repository:** [GitHub](https://github.com/Woodygan/humans-benchmark)
 - **Issues:** [Bug Tracker](https://github.com/Woodygan/humans-benchmark/issues)
 
@@ -463,13 +463,13 @@ MIT License
 
 ## 📚 Citation
 ```bibtex
-@misc{gan2026humans,
+@inproceedings{gan2026putting,
   title={Putting HUMANS first: Efficient LAM Evaluation with Human Preference Alignment},
-  author={Gan, Woody Haosheng and Held, William and Yang, Diyi},
-  year={2025},
-  howpublished={\url{https://huggingface.co/datasets/rma9248/humans-benchmark}},
-  note={A benchmark for efficiently evaluating Large Audio Models using minimal subsets aligned with human preferences}
-}
+  author={Gan, Woody Haosheng and Held, William Barr and Yang, Diyi},
+  booktitle={Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages={39132--39174},
+  year={2026}
+} 
 ```
 
 This benchmark builds upon several existing audio evaluation frameworks:
